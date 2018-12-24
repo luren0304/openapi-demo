@@ -1,3 +1,0 @@
-FileName=exch.HKD.USD.4203359020385280.txt
-Delimiter=,
-HKD,USD

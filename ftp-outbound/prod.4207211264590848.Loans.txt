@@ -1,3 +1,0 @@
-FileName=prod.4207211264590848.Loans.txt
-Delimiter=,
-Loans
