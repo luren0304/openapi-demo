@@ -1,0 +1,3 @@
+FileName=exch.HKD.USD.4203255158899712.txt
+Delimiter=,
+HKD,USD

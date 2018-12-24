@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="webjars/jquery/3.3.1-1/jquery.min.js"></script>
+<script src="webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+	alert(window.location.search);
+	alert(window.location.href);
+	var codeurl = window.location.search;
+	if(codeurl.indexOf("?code=") != -1){
+		alert(codeurl);
+		//var codevalue =  codeurl.substr(codeurl.indexOf("?code=") + 6)
+		//alert(codevalue);
+		//var openurl  = 'http://localhost:8090/oauthLogin/token?code='+codevalue;
+		var openurl  = 'http://localhost:8090/oauthLogin/token'+codeurl;
+		alert(openurl);
+		window.open(openurl);	
+		alert("end"); 
+		//window.open('http://10.4.2.76:8092/test/oauth/authorize?&client_id=CLIENT_TEST_ID_OAUTH2&client_secret=06e66dbb-5d07-4f2b-a66d-bb5d070f2b1b&redirect_uri=http://localhost:8090&code=' +codevalue)
+	}
+});
+</script>
+</head>
+<body>
+	<div>
+		User Login <a
+			href="http://10.4.2.76:8092/portal/oauth/authorize?response_type=code&client_id=TEST_LOGIN_CLIENT&redirect_uri=http://localhost:8090&scope=openid">Login
+			in Gravitee.io AM</a>
+			
+		
+			<!-- <a
+			href="http://10.4.2.76:8092/test/oauth/authorize?response_type=token&client_id=CLIENT_TEST_ID_OAUTH2&redirect_uri=http://localhost:8090">Login
+			in Gravitee.io AM</a>
+			 -->
+			<!-- <a
+			href="http://10.4.2.76:8092/test/oauth/authorize?response_type=token&client_id=CLIENT_TEST_ID_OAUTH2&redirect_uri=http://localhost:8090&scope=openid">Login
+			in Gravitee.io AM</a> -->
+			<!-- 
+			<a
+			href="http://10.4.2.76:8092/test/oauth/token?grant_type=client_credentials&client_id=CLIENT_TEST_ID_OAUTH2&client_secret=06e66dbb-5d07-4f2b-a66d-bb5d070f2b1b&redirect_uri=http://localhost:8090&scope=openid">Login
+			in Gravitee.io AM</a> -->
+	</div>
+</body>
+</html>

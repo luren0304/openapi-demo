@@ -1,0 +1,38 @@
+[
+{"ccy":"HKD",
+ "relvtCcy":"USD",
+ "mid": "7.75879797",
+ "bid": "7.76879797",
+ "ask": "7.75979797",
+ "feedSource": "Bloomberg",
+ "lastDate": "2018-08-22",
+ "lastDateTime":"2018-08-22 11:01:23"
+},
+{"ccy":"EUR",
+ "relvtCcy":"USD",
+ "mid": "1.15879797",
+ "bid": "1.16879797",
+ "ask": "1.15979797",
+ "feedSource": "Bloomberg",
+ "lastDate": "2018-08-22",
+ "lastDateTime":"2018-08-22 11:01:24"
+},
+{"ccy":"AUD",
+ "relvtCcy":"USD",
+ "mid": "0.75879797",
+ "bid": "0.76879797",
+ "ask": "0.75979797",
+ "feedSource": "Bloomberg",
+ "lastDate": "2018-08-22",
+ "lastDateTime":"2018-08-22 11:01:25"
+},
+{"ccy":"CAD",
+ "relvtCcy":"USD",
+ "mid": "0.76079797",
+ "bid": "0.76579797",
+ "ask": "0.75997097",
+ "feedSource": "Bloomberg",
+ "lastDate": "2018-08-22",
+ "lastDateTime":"2018-08-22 11:01:26"
+}
+]

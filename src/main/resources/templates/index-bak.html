@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="webjars/jquery/3.3.1-1/jquery.min.js"></script>
+<script src="webjars/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btn_ExbatchAdd").click(function() {
+			$.getJSON('json/ExchangeRate.json', function(data) {
+				var saveDataAry = [];
+				for (var i = 0; i < data.length; i++) {
+					console.log(data[i]);
+					saveDataAry.push(data[i]);
+				}
+				console.log(saveDataAry);
+				console.log(JSON.stringify(saveDataAry));
+				$.ajax({
+					type : "POST",
+					url : "exchangeRate/createExchangeRateLst",
+					dataType : "json",
+					contentType : "application/json",
+					data : JSON.stringify(saveDataAry),
+					//data : $.toJSON(saveDataAry),
+					success : function(data) {
+
+					}
+				});
+			});
+		});
+/* 
+		$("#btn_Add").click(function() {
+
+			var saveData = {
+				"ccy" : "HKD",
+				"relvtCcy" : "USD",
+				"mid" : "7.75879797",
+				"bid" : "7.76879797",
+				"ask" : "7.75979797",
+				"feedSource" : "Bloomberg",
+				"lastDate" : "2018-08-23"
+			};
+			console.log(saveData);
+			$.ajax({
+				type : "POST",
+				url : "exchangeRate/createExchangeRate",
+				dataType : "json",
+				contentType : "application/json",
+				data : JSON.stringify(saveData),
+				success : function(data) {
+
+				}
+			});
+		});
+ */
+		$("#btn_ExAddObj").click(function() {
+			var saveData = {
+				"ccy" : "HKD",
+				"relvtCcy" : "USD",
+				"mid" : "7.75879797",
+				"bid" : "7.76879797",
+				"ask" : "7.75979797",
+				"feedSource" : "Bloomberg",
+				"lastDate" : "2018-08-23",
+				"lastDateTime":"2018-08-22 11:01:20"
+			};
+			console.log(saveData);
+			$.ajax({
+				type : "POST",
+				url : "exchangeRate/createExchangeRateObj",
+				dataType : "json",
+				contentType : "application/json",
+				data : JSON.stringify(saveData),
+				success : function(data) {
+
+				}
+			});
+		});
+	});
+</script>
+</head>
+<body>
+	<div id="ExchangeRate">
+		<div>
+			<input type="text" value="Exchange Rate"> <input
+				type="button" name="btn_batchAdd" id="btn_ExbatchAdd" value="Batch" />
+		</div>
+		<div>
+			<input type="button" name="btn_AddObj" id="btn_ExAddObj" value="AddObj" />
+		</div>
+
+		<div id="div_Ccy">
+			<input type="text" name="txt_Ccy" id="txt_Ccy" /> 
+			<input type="text" name="txt_RelvtCcy" id="txt_RelvtCcy" /> 
+			<input type="button" name="btn_Query" id="Ebtn_Query" value="Query" />
+		</div>
+	</div>
+	
+	<div id="Loans">
+		<div>
+			<input type="text" value="Loans"> <input
+				type="button" name="btn_batchAdd" id="btn_LBatchAdd" value="Batch" />
+		</div>
+
+		<div>
+			<input type="button" name="btn_AddObj" id="btn_LAddObj" value="AddObj" />
+		</div>
+
+		<div id="div_LProdID">
+			<input type="text" name="txt_ProdID" id="txt_ProdID" />
+			<input type="button" name="btn_Query" id="btn_LQuery" value="Query" />
+		</div>
+	</div>
+	
+	<div id="Deposit">
+		<div>
+			<input type="text" value="Loans"> <input
+				type="button" name="btn_batchAdd" id="btn_DBatchAdd" value="Batch" />
+		</div>
+
+		<div>
+			<input type="button" name="btn_AddObj" id="btn_DAddObj" value="AddObj" />
+		</div>
+
+		<div id="div_DProdID">
+			<input type="text"   name="txt_ProdID" id="txt_ProdID" />
+			<input type="button" name="btn_Query" id="btn_DQuery" value="Query" />
+		</div>
+	</div>
+</body>
+</html>
