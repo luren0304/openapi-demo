@@ -2,6 +2,7 @@ package com.excel.demo.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -12,31 +13,30 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 
 import com.excel.demo.bean.Deposit;
 import com.excel.demo.bean.Loan;
 import com.excel.demo.bean.RateInfo;
 
-@ConfigurationProperties(prefix="sftp")
+@Configuration
 public class CommonUtils {
 	
+	@Value("${sftp.localInpath}")
 	private String localInpath;
-	public String getLocalInpath() {
-		return localInpath;
-	}
-	public void setLocalInpath(String localInpath) {
-		this.localInpath = localInpath;
-	}
-	public String getLocalOutpath() {
-		return localOutpath;
-	}
-	public void setLocalOutpath(String localOutpath) {
-		this.localOutpath = localOutpath;
-	}
-
-
+	
+	@Value("${sftp.localOutpath}")
 	private String localOutpath;
+	
+	@Value("${sftp.file.delimiter:.}")
+	private String fileDelimiter;
+	
+	@Value("${sftp.romteOut.file.conv:txt}")
+	private String remoteOutFileConv;
+	
+	@Value("${sftp.remoteIn.file.conv:txt}")
+	private String remoteInFileConv;
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 	
@@ -59,12 +59,19 @@ public class CommonUtils {
 			return false;
 		}
 		String ls_context="FileName=" + as_FileName;
-		LOGGER.info("as_FileName " + localOutpath +"/"+ as_FileName);
+		
 		PrintWriter lPw_Out = null;
 		try{
-			lPw_Out = new PrintWriter(new BufferedWriter(new FileWriter(localOutpath +"/"+ as_FileName, false)), true);
-			lPw_Out.println(ls_context);
-			ls_context = "Delimiter=,";
+			String ls_localOutpath = null;
+			if(!localOutpath.endsWith(File.separator)) {
+				ls_localOutpath = localOutpath + File.separator + as_FileName + "." + remoteOutFileConv;
+			}else {
+				ls_localOutpath = localOutpath + as_FileName + "." + remoteOutFileConv;;
+			}
+			LOGGER.info("ls_localOutpath " + ls_localOutpath);
+			lPw_Out = new PrintWriter(new BufferedWriter(new FileWriter(ls_localOutpath, false)), true);
+			lPw_Out.println(ls_context + "." + remoteInFileConv);
+			ls_context = "Delimiter=" + fileDelimiter;
 			lPw_Out.println(ls_context);
 			ls_context = as_content;
 			lPw_Out.println(ls_context);
@@ -97,19 +104,25 @@ public class CommonUtils {
 			return false;
 		}
 		String ls_context="FileName=" + as_FileName;
-		LOGGER.info("as_FileName " + localOutpath +"/"+ as_FileName);
 		PrintWriter lPw_Out = null;
 		try{
-			lPw_Out = new PrintWriter(new BufferedWriter(new FileWriter(localOutpath +"/"+ as_FileName, false)), true);
-			lPw_Out.println(ls_context);
-			ls_context = "Delimiter=,";
+			String ls_localOutpath = null;
+			if(!localOutpath.endsWith(File.separator)) {
+				ls_localOutpath = localOutpath + File.separator + as_FileName + "." + remoteOutFileConv;
+			}else {
+				ls_localOutpath = localOutpath + as_FileName + "." + remoteOutFileConv;
+			}
+			LOGGER.info("ls_localOutpath " + ls_localOutpath);
+			lPw_Out = new PrintWriter(new BufferedWriter(new FileWriter(ls_localOutpath, false)), true);
+			lPw_Out.println(ls_context + "." + remoteInFileConv);
+			ls_context = "Delimiter=" + fileDelimiter;
 			lPw_Out.println(ls_context);
 			if (obj instanceof RateInfo) {
-				ls_context = ((RateInfo)obj).getCcy_Cde()+","+((RateInfo)obj).getRelvt_Ccy_Cde();
+				ls_context = ((RateInfo)obj).getCcy_Cde()+ fileDelimiter+((RateInfo)obj).getRelvt_Ccy_Cde();
 			}else if (obj instanceof Loan) {
-				ls_context = ((Loan)obj).getProduct() + "," + ((Loan)obj).getprodId();
+				ls_context = ((Loan)obj).getProduct() + fileDelimiter + ((Loan)obj).getprodId();
 			}else if (obj instanceof Deposit) {
-				ls_context = ((Deposit)obj).getProduct() + "," + ((Deposit)obj).getprodId();
+				ls_context = ((Deposit)obj).getProduct() + fileDelimiter + ((Deposit)obj).getprodId();
 			}
 			lPw_Out.println(ls_context);
 			lPw_Out.flush();
@@ -135,12 +148,19 @@ public class CommonUtils {
 	public void getProdsByFile(List a_ProdLst, String as_Filename, Object obj) {
 		BufferedReader l_br = null;
 		try{
-			l_br = new BufferedReader(new FileReader(localInpath + "/" + as_Filename));
+			String ls_localInpath = null;
+			if(!localInpath.endsWith(File.separator)) {
+				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;
+			}else {
+				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
+			}
+			LOGGER.info("ls_localInpath " + ls_localInpath);
+			
+			l_br = new BufferedReader(new FileReader(ls_localInpath));
 			String ls_Line = l_br.readLine();
 			while(ls_Line != null){
 				LOGGER.info("ls_Line : " +ls_Line);
-				String[] ls_prod = ls_Line.split(",");
-				//info
+				String[] ls_prod = ls_Line.split(fileDelimiter);
 				LOGGER.info("ls_prod.length : " +ls_prod.length);
 				if(obj instanceof Loan) {
 					((Loan) obj).setprodId(ls_prod[0]);
@@ -201,11 +221,18 @@ public class CommonUtils {
 		
 		BufferedReader l_br = null;
 		try{
-			l_br = new BufferedReader(new FileReader(localInpath + "/" + as_Filename));
+			String ls_localInpath = null;
+			if(!localInpath.endsWith(File.separator)) {
+				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;;
+			}else {
+				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
+			}
+			LOGGER.info("ls_localInpath " + ls_localInpath);
+			l_br = new BufferedReader(new FileReader(ls_localInpath));
 			String ls_Line = l_br.readLine();
 			while(ls_Line != null){
 				LOGGER.info("ls_Line : " +ls_Line);
-				String[] ls_Info = ls_Line.split(",");
+				String[] ls_Info = ls_Line.split(fileDelimiter);
 				//info
 				if(info.getprodId() == null)
 						info.setprodId(ls_Info[0]);
@@ -256,11 +283,18 @@ public class CommonUtils {
 		
 		BufferedReader l_br = null;
 		try{
-			l_br = new BufferedReader(new FileReader(localInpath + "/" + as_Filename));
+			String ls_localInpath = null;
+			if(!localInpath.endsWith(File.separator)) {
+				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;;
+			}else {
+				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
+			}
+			LOGGER.info("ls_localInpath " + ls_localInpath);
+			l_br = new BufferedReader(new FileReader(ls_localInpath));
 			String ls_Line = l_br.readLine();
 			while(ls_Line != null){
 				LOGGER.info("ls_Line : " +ls_Line);
-				String[] ls_Info = ls_Line.split(",");
+				String[] ls_Info = ls_Line.split(fileDelimiter);
 				if(info.getprodId() == null)
 					info.setprodId(ls_Info[0]);
 				if (ls_Info.length > 1)
@@ -312,13 +346,20 @@ public class CommonUtils {
 		
 		BufferedReader l_br = null;
 		try{
-			l_br = new BufferedReader(new FileReader(localInpath + "/" + as_Filename));
+			String ls_localInpath = null;
+			if(!localInpath.endsWith(File.separator)) {
+				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;;
+			}else {
+				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
+			}
+			LOGGER.info("ls_localInpath " + ls_localInpath);
+			l_br = new BufferedReader(new FileReader(ls_localInpath));
 			String ls_Line = l_br.readLine();
 			String ls_Ccy = info.getCcy_Cde();
 			String ls_RelvtCcy = info.getRelvt_Ccy_Cde();
 			while(ls_Line != null){
 				LOGGER.info("ls_Line : " +ls_Line);
-				String[] rates = ls_Line.split(",");
+				String[] rates = ls_Line.split(fileDelimiter);
 				//info
 					
 				if(info.getCcy_Cde() == null) {
@@ -354,4 +395,5 @@ public class CommonUtils {
 			}
 		}
 	}
+
 }

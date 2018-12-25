@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.excel.demo.bean.RateInfo;
-import com.excel.demo.utils.RateProcess;
+import com.excel.demo.utils.InterfaceFileProcess;
 
 @RestController
 @RequestMapping("/rateinfo")
@@ -25,7 +25,7 @@ public class RateInfoController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(RateInfoController.class);
 	@Autowired
-	private RateProcess rateProcess;
+	private InterfaceFileProcess interfaceFileProcess;
 	
 	
 	
@@ -54,7 +54,7 @@ public class RateInfoController {
 		RateInfo rateInfo = new RateInfo();
 		rateInfo.setCcy_Cde(as_Ccy);
 		rateInfo.setRelvt_Ccy_Cde(as_RelvtCcy);
-		return rateProcess.getDetails(rateInfo);
+		return interfaceFileProcess.getDetails(rateInfo);
 		
 	}	
 	

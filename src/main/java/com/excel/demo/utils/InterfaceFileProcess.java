@@ -15,18 +15,20 @@ import com.excel.demo.bean.Loan;
 import com.excel.demo.bean.RateInfo;
 
 @Configuration
-public class RateProcess {
+public class InterfaceFileProcess {
 //	
 //	@Value("${exchange.filename.prex}")
 	private String exchageFileNamePrex ="exch";
 	
+	@Value("${sftp.waitTime}")
+	private long waitTime;
+	
 	@Autowired
-	private ExchangeRateFtpProcess exchangeRateFtpProcess;
+	private InterfaceFileFtpProcess interfaceFileFtpProcess;
 	
-//	@Autowired
-	private CommonUtils commonUtils = new CommonUtils();
-	
-	private static final Logger logger = LoggerFactory.getLogger(RateProcess.class);
+	@Autowired
+	private CommonUtils commonUtils;
+	private static final Logger logger = LoggerFactory.getLogger(InterfaceFileProcess.class);
 	
 	
 
@@ -41,29 +43,30 @@ public class RateProcess {
 		String ls_FileName=null;
 		if(obj instanceof RateInfo   ) {
 			logger.info("Filename Prex: " + exchageFileNamePrex);
-			ls_FileName = commonUtils.getFileName(exchageFileNamePrex + "." + ((RateInfo)obj).getCcy_Cde() + "." + ((RateInfo)obj).getRelvt_Ccy_Cde())+".txt";
+			ls_FileName = commonUtils.getFileName(exchageFileNamePrex + "." + ((RateInfo)obj).getCcy_Cde() + "." + ((RateInfo)obj).getRelvt_Ccy_Cde());
 		}else if (obj instanceof Deposit) {
-			ls_FileName =  commonUtils.getFileName("prod" + "." + ((Deposit)obj).getProduct() + "." + ((Deposit)obj).getprodId()) + ".txt";
+			ls_FileName =  commonUtils.getFileName("prod" + "." + ((Deposit)obj).getProduct() + "." + ((Deposit)obj).getprodId());
 		}else if (obj instanceof Loan) {
-			ls_FileName =  commonUtils.getFileName("prod" + "." + ((Loan)obj).getProduct() + "." + ((Loan)obj).getprodId()) + ".txt";
+			ls_FileName =  commonUtils.getFileName("prod" + "." + ((Loan)obj).getProduct() + "." + ((Loan)obj).getprodId());
 		}
 		
-		boolean success = exchangeRateFtpProcess.generateFile(ls_FileName, obj );
+		boolean success = commonUtils.generateFile(ls_FileName, obj );
 		if(success) {
 			// put out file
-			exchangeRateFtpProcess.upload(ls_FileName);
+			interfaceFileFtpProcess.upload(ls_FileName);
 			// wait 
 			try {
-				Thread.sleep(60*1000);
+				//Thread.sleep(60*1000);
+				Thread.sleep(waitTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			//get remote in file
 			logger.info("download file start");
-			if(exchangeRateFtpProcess.download(ls_FileName)) {
+			if(interfaceFileFtpProcess.download(ls_FileName)) {
 				logger.info("download file successfully");
 				logger.info("get file details");
-				exchangeRateFtpProcess.getDetailByFile(obj, ls_FileName, l_Details);
+				commonUtils.getDetailByFile(obj, ls_FileName, l_Details);
 			}
 			logger.info("download file end");
 		}else {
@@ -84,23 +87,24 @@ public class RateProcess {
 		String ls_FileName = null;
 		String ls_Content = as_Prod;
 		List l_PordLst = new ArrayList();
-		ls_FileName = commonUtils.getFileName("prod"+ "." + as_Prod)  + ".txt";
-		boolean success = exchangeRateFtpProcess.generateFile(ls_FileName,  ls_Content);
+		ls_FileName = commonUtils.getFileName("prod"+ "." + as_Prod);
+		boolean success = commonUtils.generateFile(ls_FileName,  ls_Content);
 		if(success) {
 			// put out file
-			exchangeRateFtpProcess.upload(ls_FileName);
+			interfaceFileFtpProcess.upload(ls_FileName);
 			// wait 
 			try {
-				Thread.sleep(60*1000);
+//				Thread.sleep(60*1000);
+				Thread.sleep(waitTime);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			//get remote in file
 			logger.info("download file start");
-			if(exchangeRateFtpProcess.download(ls_FileName)) {
+			if(interfaceFileFtpProcess.download(ls_FileName)) {
 				logger.info("download file successfully");
 				logger.info("get file details");
-				exchangeRateFtpProcess.getProdsByFile(l_PordLst, ls_FileName, obj);
+				commonUtils.getProdsByFile(l_PordLst, ls_FileName, obj);
 			}
 			logger.info("download file end");
 		}

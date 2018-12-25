@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,16 +14,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.excel.demo.bean.Loan;
 import com.excel.demo.service.LoanService;
-import com.excel.demo.utils.RateProcess;
+import com.excel.demo.utils.InterfaceFileProcess;
 
 @RestController
 @RequestMapping("/loans")
 public class LoanController {
 	private static final Logger logger = LoggerFactory.getLogger(LoanController.class);
+	
+	@Value("${data.mode:db}")
+	private String dataMode;
+	
 	@Autowired
 	LoanService loanService;
 	@Autowired
-	private RateProcess rateProcess;
+	private InterfaceFileProcess interfaceFileProcess;
 	
 	@RequestMapping(method = RequestMethod.POST, value="/createObj")
 	public boolean createObj(Loan Loan) {
@@ -44,11 +49,14 @@ public class LoanController {
 	public List<Loan> findByProdId(@PathVariable("prodid") String as_ProdId) {
 		logger.info("findByProdId" + as_ProdId);
 //		return loanService.findByProdId(as_ProdId);
-		
-		Loan loan = new Loan();
-		loan.setprodId(as_ProdId);
-		loan.setProduct("Loans");
-		return rateProcess.getDetails(loan);
+		if(!dataMode.equalsIgnoreCase("ftp")) {
+			return loanService.findByProdId(as_ProdId);
+		}else {
+			Loan loan = new Loan();
+			loan.setprodId(as_ProdId);
+			loan.setProduct("Loans");
+			return interfaceFileProcess.getDetails(loan);
+		}
 		
 	}
 	
@@ -61,7 +69,10 @@ public class LoanController {
 	@RequestMapping(method = RequestMethod.GET, value="/findProd")
 	public List<Loan> findAllProd() {
 		logger.info("findAllProd");
-//		return loanService.findAllProdId();
-		return rateProcess.getProds("Loans", new Loan());
+		if(!dataMode.equalsIgnoreCase("ftp")) {
+			return loanService.findAllProdId();
+		}else {
+			return interfaceFileProcess.getProds("Loans", new Loan());
+		}
 	}
 }

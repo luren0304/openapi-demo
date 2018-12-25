@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,18 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.excel.demo.bean.Deposit;
 import com.excel.demo.service.DepositService;
-import com.excel.demo.utils.RateProcess;
+import com.excel.demo.utils.InterfaceFileProcess;
 
 @RestController
 @RequestMapping("/deposits")
 public class DepositController {
 	private static final Logger logger = LoggerFactory.getLogger(DepositController.class);
+
+	@Value("${data.mode:db}")
+	private String dataMode;
 	
 	@Autowired
 	DepositService depositService;
 	
 	@Autowired
-	private RateProcess rateProcess;
+	private InterfaceFileProcess interfaceFileProcess;
+	
 	
 	@RequestMapping(method = RequestMethod.POST, value="/createObj")
 	public boolean createObj(Deposit deposit) {
@@ -45,12 +50,15 @@ public class DepositController {
 	@RequestMapping(method = RequestMethod.GET, value="/findone/prodid/{prodid}")
 	public List<Deposit> findByProdId(@PathVariable("prodid") String as_ProdId) {
 		logger.info("findByProdId" + as_ProdId);
-//		return depositService.findByProdId(as_ProdId);
-		Deposit deposit = new Deposit();
-		deposit.setprodId(as_ProdId);
-		deposit.setProduct("Deposits");
-		return rateProcess.getDetails(deposit);
-		
+		logger.info("dataMode " + dataMode);
+		if(!dataMode.equalsIgnoreCase("ftp")) {
+			return depositService.findByProdId(as_ProdId);
+		}else {
+			Deposit deposit = new Deposit();
+			deposit.setprodId(as_ProdId);
+			deposit.setProduct("Deposits");
+			return interfaceFileProcess.getDetails(deposit);
+		}
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findall")
@@ -63,6 +71,12 @@ public class DepositController {
 	public List<Deposit> findAllProd() {
 		logger.info("findAllProd");
 //		return depositService.findAllProdId();
-		return rateProcess.getProds("Deposits", new Deposit());
+		logger.info("dataMode " + dataMode);
+		if(!dataMode.equalsIgnoreCase("ftp")) {
+			return depositService.findAllProdId();
+		}else {
+			return interfaceFileProcess.getProds("Deposits", new Deposit());
+		}
+		
 	}
 }
