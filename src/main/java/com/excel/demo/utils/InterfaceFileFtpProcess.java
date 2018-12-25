@@ -32,6 +32,7 @@ public class InterfaceFileFtpProcess {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(InterfaceFileFtpProcess.class);
 	private SFTPClientHandler l_sftpClientHandler = null;
+	
 
 	
 	/**
@@ -45,6 +46,7 @@ public class InterfaceFileFtpProcess {
 		try {
 			as_FileName = as_FileName + "." + remoteOutFileConv;
 			String ls_localOutpath = null;
+			checkDirExist(localOutpath);
 			if(!localOutpath.endsWith(File.separator)) {
 				ls_localOutpath = localOutpath + File.separator + as_FileName;
 			}else {
@@ -83,6 +85,7 @@ public class InterfaceFileFtpProcess {
 		try {
 			as_FileName = as_FileName + "." + remoteInFileConv;
 			String ls_localInpath = null;
+			checkDirExist(localInpath);
 			if(!localInpath.endsWith(File.separator)) {
 				ls_localInpath = localInpath + File.separator + as_FileName;
 			}else {
@@ -130,6 +133,16 @@ public class InterfaceFileFtpProcess {
 		return false;
 	}
 	
+	/**
+	 * check if directory exists, if not, create it.
+	 */
+	public void checkDirExist(String as_Dir) {
+		LOGGER.info("as_Dir " + as_Dir);
+		File filedir = new File(as_Dir);
+		if(!filedir.exists()) {
+			filedir.mkdirs();
+		}
+	}
 
 	public String getRemoteInpath() {
 		return remoteInpath;

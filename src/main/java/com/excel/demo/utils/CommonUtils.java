@@ -40,10 +40,23 @@ public class CommonUtils {
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 	
-	public String getFileName(String as_Filename) {
+		public String getFileName(String as_Filename) {
 		IdWorker id = new IdWorker(1);
 		return as_Filename + "." +id.nextId();
 	}
+	
+	
+	/**
+	 * check if directory exists, if not, create it.
+	 */
+	public void checkDirExist(String as_Dir) {
+		LOGGER.info("as_Dir " + as_Dir);
+		File filedir = new File(as_Dir);
+		if(!filedir.exists()) {
+			filedir.mkdirs();
+		}
+	}
+	
 	/**
 	 * Generate request file with content
 	 * 
@@ -63,6 +76,7 @@ public class CommonUtils {
 		PrintWriter lPw_Out = null;
 		try{
 			String ls_localOutpath = null;
+			checkDirExist(localOutpath);
 			if(!localOutpath.endsWith(File.separator)) {
 				ls_localOutpath = localOutpath + File.separator + as_FileName + "." + remoteOutFileConv;
 			}else {
@@ -107,6 +121,7 @@ public class CommonUtils {
 		PrintWriter lPw_Out = null;
 		try{
 			String ls_localOutpath = null;
+			checkDirExist(localOutpath);
 			if(!localOutpath.endsWith(File.separator)) {
 				ls_localOutpath = localOutpath + File.separator + as_FileName + "." + remoteOutFileConv;
 			}else {
@@ -146,7 +161,7 @@ public class CommonUtils {
 	 * @param a_Lst
 	 */
 	public void getDetailByFile(Object obj, String as_Filename, List a_Lst) {
-		
+		checkDirExist(localInpath);
 		if(obj instanceof RateInfo   ) {
 			getRateDetailByFile((RateInfo)obj, as_Filename, a_Lst);
 		}else if(obj instanceof Loan) {
@@ -156,7 +171,7 @@ public class CommonUtils {
 		}
 
 	}
-	
+
 	
 	/**
 	 * Decompose reply file for product ID
@@ -171,6 +186,7 @@ public class CommonUtils {
 		String[] ls_NextLine;
 		try{
 			String ls_localInpath = null;
+			checkDirExist(localInpath);
 			if(!localInpath.endsWith(File.separator)) {
 				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;
 			}else {
@@ -221,6 +237,7 @@ public class CommonUtils {
 		String[] ls_NextLine;
 		try{
 			String ls_localInpath = null;
+			File filedir = new File(localInpath);
 			if(!localInpath.endsWith(File.separator)) {
 				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;;
 			}else {
