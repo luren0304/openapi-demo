@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,10 +47,11 @@ public class LoanController {
 	} 
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findone/prodid/{prodid}")
-	public List<Loan> findByProdId(@PathVariable("prodid") String as_ProdId) {
+	public List<Loan> findByProdId(@PathVariable("prodid") String as_ProdId, @RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findByProdId" + as_ProdId);
 //		return loanService.findByProdId(as_ProdId);
-		if(!dataMode.equalsIgnoreCase("ftp")) {
+		logger.info("as_ConnType " + as_ConnType);
+		if(as_ConnType !=null && !as_ConnType.equalsIgnoreCase("ftp")) {
 			return loanService.findByProdId(as_ProdId);
 		}else {
 			Loan loan = new Loan();
@@ -67,9 +69,10 @@ public class LoanController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findProd")
-	public List<Loan> findAllProd() {
+	public List<Loan> findAllProd(@RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findAllProd");
-		if(!dataMode.equalsIgnoreCase("ftp")) {
+		logger.info("as_ConnType " + as_ConnType);
+		if(as_ConnType !=null && !as_ConnType.equalsIgnoreCase("ftp")) {
 			return loanService.findAllProdId();
 		}else {
 			return interfaceFileProcess.getProds("Loans", new Loan());

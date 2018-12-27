@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import com.jcraft.jsch.JSchException;
+
 
 @Component
 @ConfigurationProperties(prefix="sftp")
@@ -62,6 +64,11 @@ public class InterfaceFileFtpProcess {
 			l_sftpClientHandler.put(ls_localOutpath, as_FileName);
 		} catch (Exception e) {
 			LOGGER.error("upload file failed. error message: " + e.getMessage() );
+			if(e instanceof JSchException) {
+				if (e.getMessage().equals("Auth fail")) {
+					LOGGER.error("login ");
+				}
+			}
 			e.printStackTrace();
 		}finally {
 			if(l_sftpClientHandler != null) {
