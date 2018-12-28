@@ -20,7 +20,7 @@ public class Deposit {
 	private String minamount;
 	private String fee;
 	private String remark;
-	
+	/*
 	@Transient
 	private String errorcde;
 	@Transient
@@ -38,6 +38,8 @@ public class Deposit {
 	public void setErrormsg(String errormsg) {
 		this.errormsg = errormsg;
 	}
+	*/
+	
 	public String getProdId() {
 		return prodId;
 	}

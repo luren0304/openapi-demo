@@ -72,7 +72,7 @@ public class InterfaceFileFtpProcess {
 				try {
 					l_sftpClientHandler.quit();
 				} catch (Exception e) {
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
 		}
@@ -131,7 +131,7 @@ public class InterfaceFileFtpProcess {
 				try {
 					l_sftpClientHandler.quit();
 				} catch (Exception e) {
-					e.printStackTrace();
+//					e.printStackTrace();
 				}
 			}
 		}

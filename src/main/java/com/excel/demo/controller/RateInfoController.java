@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.excel.demo.bean.ErrorMessage;
 import com.excel.demo.bean.RateInfo;
 import com.excel.demo.utils.InterfaceFileProcess;
+import com.jcraft.jsch.SftpException;
 
 @RestController
 @RequestMapping("/rateinfo")
@@ -49,12 +51,19 @@ public class RateInfoController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value = "/RateCcy/{RateCcy}/RateRelvtCcy/{RateRelvtCcy}")
-	public List<RateInfo> getRateDetails(@PathVariable("RateCcy") String as_Ccy, @PathVariable("RateRelvtCcy") String as_RelvtCcy) {
+	public Object getRateDetails(@PathVariable("RateCcy") String as_Ccy, @PathVariable("RateRelvtCcy") String as_RelvtCcy) {
 		logger.info("getRateDetails ccy = " + as_Ccy + " relvtCcy = " + as_RelvtCcy);
 		RateInfo rateInfo = new RateInfo();
 		rateInfo.setCcy_Cde(as_Ccy);
 		rateInfo.setRelvt_Ccy_Cde(as_RelvtCcy);
-		return interfaceFileProcess.getDetails(rateInfo);
+		try {
+			return interfaceFileProcess.getDetails(rateInfo);
+		} catch (SftpException e) {
+			ErrorMessage errorMessage = new ErrorMessage();
+			errorMessage.setErrorCode(e.id);
+			errorMessage.setErrorMsg(e.getMessage());
+			return errorMessage;
+		}
 		
 	}	
 	

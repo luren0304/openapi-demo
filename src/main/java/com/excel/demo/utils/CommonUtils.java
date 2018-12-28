@@ -407,46 +407,36 @@ public class CommonUtils {
 		}
 	}
 	
-	public void handleErr(Object obj, Exception e) {
-		String errCode;
+	public SftpException handleErr(Exception e) {
+		int errCode;
 		String errMsg;
 		String msg = e.getMessage();
 		if (e instanceof JSchException) {
 			LOGGER.error("login or connect error. error message: " + msg);
 			if(msg != null) {
-				if (msg.contains("Auth failed")) {
-					errCode = "202";
+				if (msg.contains("Auth fail")) {
+					errCode = 202;
 					errMsg = "ftp login failed";
 				}else if (msg.contains("Connection timed out")) {
-					errCode = "203";
+					errCode = 203;
 					errMsg = "ftp Connection timed out";
 				}else {
-					errCode = "204";
+					errCode = 204;
 					errMsg = "ftp Connection Exception";
 				}
 			}else {
-				errCode = "204";
+				errCode = 204;
 				errMsg = "ftp Connection Exception";
 			}
 		}else if (e instanceof SftpException) {
 			LOGGER.error("SftpException error message: " + msg);
-			errCode = "205";
-			errMsg = e.toString();
+			errCode = 205;
+			errMsg = "ftp error: " + msg;
 		}else {
-			LOGGER.error("SftpException error message: " + msg);
-			errCode = "206";
-			errMsg = e.toString();
+			LOGGER.error("other error message: " + msg);
+			errCode = 206;
+			errMsg = msg;
 		}
-		if(obj instanceof RateInfo   ) {
-			((RateInfo) obj).setErrorcde(errCode);
-			((RateInfo) obj).setErrormsg(errMsg);
-		}else if(obj instanceof Loan) {
-			((Loan) obj).setErrorcde(errCode);
-			((Loan) obj).setErrormsg(errMsg);
-		}else if(obj instanceof Deposit) {
-			((Deposit) obj).setErrorcde(errCode);
-			((Deposit) obj).setErrormsg(errMsg);
-		}
+		return new SftpException(errCode, errMsg);
 	}
-	
 }

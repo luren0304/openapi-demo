@@ -41,7 +41,7 @@ public class InterfaceFileProcess {
 	 * @param obj
 	 * @return
 	 */
-	public List getDetails(Object obj) {
+	public List getDetails(Object obj) throws SftpException{
 		List l_Details = new ArrayList();
 		String ls_FileName=null;
 		if(obj instanceof RateInfo   ) {
@@ -59,9 +59,7 @@ public class InterfaceFileProcess {
 			try {
 				interfaceFileFtpProcess.upload(ls_FileName);
 			} catch (Exception e) {
-				commonUtils.handleErr(obj, e);
-				l_Details.add(obj);
-				return l_Details;
+				throw commonUtils.handleErr(e);
 			}
 			// wait 
 			try {
@@ -75,9 +73,7 @@ public class InterfaceFileProcess {
 			try {
 				success = interfaceFileFtpProcess.download(ls_FileName);
 			} catch (Exception e) {
-				commonUtils.handleErr(obj, e);
-				l_Details.add(obj);
-				return l_Details;
+				throw commonUtils.handleErr(e);
 			}
 			if(success) {
 				logger.info("download file successfully");
@@ -99,7 +95,7 @@ public class InterfaceFileProcess {
 	 * @param obj
 	 * @return
 	 */
-	public List getProds(String as_Prod, Object obj) {
+	public List getProds(String as_Prod, Object obj) throws SftpException{
 		String ls_FileName = null;
 		String ls_Content = as_Prod;
 		List l_PordLst = new ArrayList();
@@ -110,9 +106,7 @@ public class InterfaceFileProcess {
 			try {
 				interfaceFileFtpProcess.upload(ls_FileName);
 			} catch (Exception e) {
-				commonUtils.handleErr(obj, e);
-				l_PordLst.add(obj);
-				return l_PordLst;
+				throw commonUtils.handleErr(e);
 			}
 			
 			// wait 
@@ -127,9 +121,7 @@ public class InterfaceFileProcess {
 			try {
 				success = interfaceFileFtpProcess.download(ls_FileName);
 			} catch (Exception e) {
-				commonUtils.handleErr(obj, e);
-				l_PordLst.add(obj);
-				return l_PordLst;
+				throw commonUtils.handleErr(e);
 			}
 			if(success) {
 				logger.info("download file successfully");

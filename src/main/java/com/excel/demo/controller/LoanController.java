@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.excel.demo.bean.ErrorMessage;
 import com.excel.demo.bean.Loan;
 import com.excel.demo.service.LoanService;
 import com.excel.demo.utils.InterfaceFileProcess;
+import com.jcraft.jsch.SftpException;
 
 @RestController
 @RequestMapping("/loans")
@@ -47,7 +49,7 @@ public class LoanController {
 	} 
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findone/prodid/{prodid}")
-	public List<Loan> findByProdId(@PathVariable("prodid") String as_ProdId, @RequestHeader("tyk-conn-type") String as_ConnType) {
+	public Object findByProdId(@PathVariable("prodid") String as_ProdId, @RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findByProdId" + as_ProdId);
 //		return loanService.findByProdId(as_ProdId);
 		logger.info("as_ConnType " + as_ConnType);
@@ -57,7 +59,14 @@ public class LoanController {
 			Loan loan = new Loan();
 			loan.setProdId(as_ProdId);
 			loan.setProduct("Loans");
-			return interfaceFileProcess.getDetails(loan);
+			try {
+				return interfaceFileProcess.getDetails(loan);
+			} catch (SftpException e) {
+				ErrorMessage errorMessage = new ErrorMessage();
+				errorMessage.setErrorCode(e.id);
+				errorMessage.setErrorMsg(e.getMessage());
+				return errorMessage;
+			}
 		}
 		
 	}
@@ -69,13 +78,20 @@ public class LoanController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findProd")
-	public List<Loan> findAllProd(@RequestHeader("tyk-conn-type") String as_ConnType) {
+	public Object findAllProd(@RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findAllProd");
 		logger.info("as_ConnType " + as_ConnType);
 		if(as_ConnType !=null && !as_ConnType.equalsIgnoreCase("ftp")) {
 			return loanService.findAllProdId();
 		}else {
-			return interfaceFileProcess.getProds("Loans", new Loan());
+			try {
+				return interfaceFileProcess.getProds("Loans", new Loan());
+			} catch (SftpException e) {
+				ErrorMessage errorMessage = new ErrorMessage();
+				errorMessage.setErrorCode(e.id);
+				errorMessage.setErrorMsg(e.getMessage());
+				return errorMessage;
+			}
 		}
 	}
 }

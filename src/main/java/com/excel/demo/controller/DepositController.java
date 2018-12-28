@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.excel.demo.bean.Deposit;
+import com.excel.demo.bean.ErrorMessage;
 import com.excel.demo.service.DepositService;
 import com.excel.demo.utils.InterfaceFileProcess;
+import com.jcraft.jsch.SftpException;
 
 @RestController
 @RequestMapping("/deposits")
@@ -49,7 +51,7 @@ public class DepositController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findone/prodid/{prodid}")
-	public List<?> findByProdId(@PathVariable("prodid") String as_ProdId, @RequestHeader("tyk-conn-type") String as_ConnType) {
+	public Object findByProdId(@PathVariable("prodid") String as_ProdId, @RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findByProdId" + as_ProdId);
 //		logger.info("dataMode " + dataMode);
 		logger.info("as_ConnType " + as_ConnType);
@@ -59,7 +61,14 @@ public class DepositController {
 			Deposit deposit = new Deposit();
 			deposit.setProdId(as_ProdId);
 			deposit.setProduct("Deposits");
-			return interfaceFileProcess.getDetails(deposit);
+			try {
+				return interfaceFileProcess.getDetails(deposit);
+			} catch (SftpException e) {
+				ErrorMessage errorMessage = new ErrorMessage();
+				errorMessage.setErrorCode(e.id);
+				errorMessage.setErrorMsg(e.getMessage());
+				return errorMessage;
+			}
 		}
 	}
 	
@@ -78,7 +87,14 @@ public class DepositController {
 		if(as_ConnType !=null && !as_ConnType.equalsIgnoreCase("ftp")) {
 			return depositService.findAllProdId();
 		}else {
-			return interfaceFileProcess.getProds("Deposits", new Deposit());
+			try {
+				return interfaceFileProcess.getProds("Deposits", new Deposit());
+			} catch (SftpException e) {
+				ErrorMessage errorMessage = new ErrorMessage();
+				errorMessage.setErrorCode(e.id);
+				errorMessage.setErrorMsg(e.getMessage());
+				return errorMessage;
+			}
 		}
 		
 	}

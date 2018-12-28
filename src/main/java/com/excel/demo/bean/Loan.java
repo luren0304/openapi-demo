@@ -20,7 +20,7 @@ public class Loan {
 	private String prdinfo3;
 	private String fee;
 	private String remark;
-	
+/*	
 	@Transient
 	private String errorcde;
 	@Transient
@@ -39,6 +39,7 @@ public class Loan {
 	public void setErrormsg(String errormsg) {
 		this.errormsg = errormsg;
 	}
+	*/
 	public String getProdId() {
 		return prodId;
 	}

@@ -18,7 +18,7 @@ public class RateInfo {
 	private BigDecimal Ask = null;
 	private String feed_Source;
 	private String lastDate;
-	
+/*	
 	@Transient
 	private String errorcde;
 	@Transient
@@ -37,6 +37,8 @@ public class RateInfo {
 	public void setErrormsg(String errormsg) {
 		this.errormsg = errormsg;
 	}
+	
+	*/
 	public String getCcy_Cde() {
 		return ccy_Cde;
 	}
