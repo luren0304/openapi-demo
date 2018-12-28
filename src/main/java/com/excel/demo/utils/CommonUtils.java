@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 import com.excel.demo.bean.Deposit;
 import com.excel.demo.bean.Loan;
 import com.excel.demo.bean.RateInfo;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import com.opencsv.CSVReader;
 
 @Configuration
@@ -135,9 +137,9 @@ public class CommonUtils {
 			if (obj instanceof RateInfo) {
 				ls_context = ((RateInfo)obj).getCcy_Cde()+ fileDelimiter+((RateInfo)obj).getRelvt_Ccy_Cde();
 			}else if (obj instanceof Loan) {
-				ls_context = ((Loan)obj).getProduct() + fileDelimiter + ((Loan)obj).getprodId();
+				ls_context = ((Loan)obj).getProduct() + fileDelimiter + ((Loan)obj).getProdId();
 			}else if (obj instanceof Deposit) {
-				ls_context = ((Deposit)obj).getProduct() + fileDelimiter + ((Deposit)obj).getprodId();
+				ls_context = ((Deposit)obj).getProduct() + fileDelimiter + ((Deposit)obj).getProdId();
 			}
 			lPw_Out.println(ls_context);
 			lPw_Out.flush();
@@ -198,11 +200,11 @@ public class CommonUtils {
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
 				if(obj instanceof Loan) {
-					((Loan) obj).setprodId(ls_NextLine[0]);
+					((Loan) obj).setProdId(ls_NextLine[0]);
 					a_ProdLst.add(obj);
 					obj = new Loan();
 				}else if (obj instanceof Deposit) {
-					((Deposit) obj).setprodId(ls_NextLine[0]);
+					((Deposit) obj).setProdId(ls_NextLine[0]);
 					a_ProdLst.add(obj);
 					obj = new Deposit();
 				}
@@ -248,8 +250,8 @@ public class CommonUtils {
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
 				//info
-				if(info.getprodId() == null)
-						info.setprodId(ls_NextLine[0]);
+				if(info.getProdId() == null)
+						info.setProdId(ls_NextLine[0]);
 				if (ls_NextLine.length > 2)
 					info.setProduct(ls_NextLine[1]);
 				if (ls_NextLine.length > 2)
@@ -307,8 +309,8 @@ public class CommonUtils {
 			reader = new CSVReader(new FileReader(ls_localInpath));
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
-				if(info.getprodId() == null)
-					info.setprodId(ls_NextLine[0]);
+				if(info.getProdId() == null)
+					info.setProdId(ls_NextLine[0]);
 				if (ls_NextLine.length > 1)
 					info.setProduct(ls_NextLine[1]);
 				if (ls_NextLine.length > 2)	
@@ -404,4 +406,47 @@ public class CommonUtils {
 			}
 		}
 	}
+	
+	public void handleErr(Object obj, Exception e) {
+		String errCode;
+		String errMsg;
+		String msg = e.getMessage();
+		if (e instanceof JSchException) {
+			LOGGER.error("login or connect error. error message: " + msg);
+			if(msg != null) {
+				if (msg.contains("Auth failed")) {
+					errCode = "202";
+					errMsg = "ftp login failed";
+				}else if (msg.contains("Connection timed out")) {
+					errCode = "203";
+					errMsg = "ftp Connection timed out";
+				}else {
+					errCode = "204";
+					errMsg = "ftp Connection Exception";
+				}
+			}else {
+				errCode = "204";
+				errMsg = "ftp Connection Exception";
+			}
+		}else if (e instanceof SftpException) {
+			LOGGER.error("SftpException error message: " + msg);
+			errCode = "205";
+			errMsg = e.toString();
+		}else {
+			LOGGER.error("SftpException error message: " + msg);
+			errCode = "206";
+			errMsg = e.toString();
+		}
+		if(obj instanceof RateInfo   ) {
+			((RateInfo) obj).setErrorcde(errCode);
+			((RateInfo) obj).setErrormsg(errMsg);
+		}else if(obj instanceof Loan) {
+			((Loan) obj).setErrorcde(errCode);
+			((Loan) obj).setErrormsg(errMsg);
+		}else if(obj instanceof Deposit) {
+			((Deposit) obj).setErrorcde(errCode);
+			((Deposit) obj).setErrormsg(errMsg);
+		}
+	}
+	
 }

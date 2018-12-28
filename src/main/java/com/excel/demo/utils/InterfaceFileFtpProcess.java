@@ -44,7 +44,7 @@ public class InterfaceFileFtpProcess {
 	 * @param as_FileName
 	 */
 	
-	public void upload (String as_FileName) {
+	public void upload (String as_FileName) throws Exception{
 		try {
 			as_FileName = as_FileName + "." + remoteOutFileConv;
 			String ls_localOutpath = null;
@@ -55,6 +55,7 @@ public class InterfaceFileFtpProcess {
 				ls_localOutpath = localOutpath + as_FileName ;
 			}
 			LOGGER.info("ls_localOutpath " + ls_localOutpath);
+				
 			if(l_sftpClientHandler == null) {
 				l_sftpClientHandler = SFTPClientHandler.getInstance(host, port);
 			}
@@ -64,12 +65,8 @@ public class InterfaceFileFtpProcess {
 			l_sftpClientHandler.put(ls_localOutpath, as_FileName);
 		} catch (Exception e) {
 			LOGGER.error("upload file failed. error message: " + e.getMessage() );
-			if(e instanceof JSchException) {
-				if (e.getMessage().equals("Auth fail")) {
-					LOGGER.error("login ");
-				}
-			}
 			e.printStackTrace();
+			throw e;
 		}finally {
 			if(l_sftpClientHandler != null) {
 				try {
@@ -88,7 +85,7 @@ public class InterfaceFileFtpProcess {
 	 * @param as_FileName
 	 * @return
 	 */
-	public boolean download(String as_FileName) {
+	public boolean download(String as_FileName) throws Exception{
 		try {
 			as_FileName = as_FileName + "." + remoteInFileConv;
 			String ls_localInpath = null;
@@ -128,6 +125,7 @@ public class InterfaceFileFtpProcess {
 		} catch (Exception e) {
 			LOGGER.error("upload file failed. error message: " + e.getMessage() );
 			e.printStackTrace();
+			throw e;
 		}finally {
 			if(l_sftpClientHandler != null) {
 				try {

@@ -1,5 +1,6 @@
 package com.excel.demo.bean;
 
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -19,10 +20,29 @@ public class Loan {
 	private String prdinfo3;
 	private String fee;
 	private String remark;
-	public String getprodId() {
+	
+	@Transient
+	private String errorcde;
+	@Transient
+	private String errormsg;
+	
+	
+	public String getErrorcde() {
+		return errorcde;
+	}
+	public void setErrorcde(String errorcde) {
+		this.errorcde = errorcde;
+	}
+	public String getErrormsg() {
+		return errormsg;
+	}
+	public void setErrormsg(String errormsg) {
+		this.errormsg = errormsg;
+	}
+	public String getProdId() {
 		return prodId;
 	}
-	public void setprodId(String prodId) {
+	public void setProdId(String prodId) {
 		this.prodId = prodId;
 	}
 	public String getProduct() {

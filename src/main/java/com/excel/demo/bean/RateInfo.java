@@ -3,6 +3,8 @@ package com.excel.demo.bean;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+import org.springframework.data.annotation.Transient;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -16,6 +18,25 @@ public class RateInfo {
 	private BigDecimal Ask = null;
 	private String feed_Source;
 	private String lastDate;
+	
+	@Transient
+	private String errorcde;
+	@Transient
+	private String errormsg;
+	
+	
+	public String getErrorcde() {
+		return errorcde;
+	}
+	public void setErrorcde(String errorcde) {
+		this.errorcde = errorcde;
+	}
+	public String getErrormsg() {
+		return errormsg;
+	}
+	public void setErrormsg(String errormsg) {
+		this.errormsg = errormsg;
+	}
 	public String getCcy_Cde() {
 		return ccy_Cde;
 	}

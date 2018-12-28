@@ -55,7 +55,7 @@ public class LoanController {
 			return loanService.findByProdId(as_ProdId);
 		}else {
 			Loan loan = new Loan();
-			loan.setprodId(as_ProdId);
+			loan.setProdId(as_ProdId);
 			loan.setProduct("Loans");
 			return interfaceFileProcess.getDetails(loan);
 		}

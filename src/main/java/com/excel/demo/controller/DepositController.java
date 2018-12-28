@@ -57,7 +57,7 @@ public class DepositController {
 			return depositService.findByProdId(as_ProdId);
 		}else {
 			Deposit deposit = new Deposit();
-			deposit.setprodId(as_ProdId);
+			deposit.setProdId(as_ProdId);
 			deposit.setProduct("Deposits");
 			return interfaceFileProcess.getDetails(deposit);
 		}
@@ -70,7 +70,7 @@ public class DepositController {
 	}
 	
 	@RequestMapping(method = RequestMethod.GET, value="/findProd")
-	public List<?> findAllProd(@RequestHeader("tyk-conn-type") String as_ConnType) {
+	public Object findAllProd(@RequestHeader("tyk-conn-type") String as_ConnType) {
 		logger.info("findAllProd");
 //		return depositService.findAllProdId();
 //		logger.info("dataMode " + dataMode);
