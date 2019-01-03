@@ -8,26 +8,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
 import com.excel.demo.bean.Deposit;
 import com.excel.demo.bean.Loan;
 import com.excel.demo.bean.RateInfo;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 
-@Configuration
+@Component
 public class InterfaceFileProcess {
-//	
-//	@Value("${exchange.filename.prex}")
-	private String exchageFileNamePrex ="exch";
 	
 	@Value("${sftp.waitTime}")
 	private long waitTime;
 	
 	@Autowired
 	private InterfaceFileFtpProcess interfaceFileFtpProcess;
+	
+	@Autowired
+	private ApplicationContext applicationContext; 
 	
 	@Autowired
 	private CommonUtils commonUtils;
@@ -45,8 +44,7 @@ public class InterfaceFileProcess {
 		List l_Details = new ArrayList();
 		String ls_FileName=null;
 		if(obj instanceof RateInfo   ) {
-			logger.info("Filename Prex: " + exchageFileNamePrex);
-			ls_FileName = commonUtils.getFileName(exchageFileNamePrex + "." + ((RateInfo)obj).getCcy_Cde() + "." + ((RateInfo)obj).getRelvt_Ccy_Cde());
+			ls_FileName = commonUtils.getFileName("exch" + "." + ((RateInfo)obj).getCcy_Cde() + "." + ((RateInfo)obj).getRelvt_Ccy_Cde());
 		}else if (obj instanceof Deposit) {
 			ls_FileName =  commonUtils.getFileName("prod" + "." + ((Deposit)obj).getProduct() + "." + ((Deposit)obj).getProdId());
 		}else if (obj instanceof Loan) {
@@ -61,19 +59,21 @@ public class InterfaceFileProcess {
 			} catch (Exception e) {
 				throw commonUtils.handleErr(e);
 			}
-			// wait 
-			try {
-				//Thread.sleep(60*1000);
-				Thread.sleep(waitTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			//get remote in file
 			logger.info("download file start");
-			try {
-				success = interfaceFileFtpProcess.download(ls_FileName);
-			} catch (Exception e) {
-				throw commonUtils.handleErr(e);
+			FtpFileEvent ftpFileEvent = new FtpFileEvent(this, ls_FileName);
+			int loopCnt = 10;
+			for(int i = 0; i < loopCnt; i ++) {
+				try {
+					applicationContext.publishEvent(ftpFileEvent);
+					success = ftpFileEvent.isDownloadFlag();
+					if(success)
+						break;
+					if(i != loopCnt - 1)
+						Thread.sleep(waitTime/loopCnt);
+				} catch (Exception e) {
+					throw commonUtils.handleErr(e);
+				}
 			}
 			if(success) {
 				logger.info("download file successfully");
@@ -109,20 +109,23 @@ public class InterfaceFileProcess {
 				throw commonUtils.handleErr(e);
 			}
 			
-			// wait 
-			try {
-//				Thread.sleep(60*1000);
-				Thread.sleep(waitTime);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
 			//get remote in file
 			logger.info("download file start");
-			try {
-				success = interfaceFileFtpProcess.download(ls_FileName);
-			} catch (Exception e) {
-				throw commonUtils.handleErr(e);
+			FtpFileEvent ftpFileEvent = new FtpFileEvent(this, ls_FileName);
+			int loopCnt = 10;
+			for(int i = 0; i < loopCnt; i ++) {
+				try {
+					applicationContext.publishEvent(ftpFileEvent);
+					success = ftpFileEvent.isDownloadFlag();
+					if(success)
+						break;
+					if(i != loopCnt - 1)
+						Thread.sleep(waitTime/loopCnt);
+				} catch (Exception e) {
+					throw commonUtils.handleErr(e);
+				}
 			}
+			
 			if(success) {
 				logger.info("download file successfully");
 				logger.info("get file details");

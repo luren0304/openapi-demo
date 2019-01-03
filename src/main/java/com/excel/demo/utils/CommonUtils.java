@@ -267,7 +267,7 @@ public class CommonUtils {
 				if (ls_NextLine.length > 7)
 					info.setFee(ls_NextLine[7]);
 				if (ls_NextLine.length > 8)
-					info.setRemark(ls_NextLine[8]);
+					info.setRemark(removeLFChar(ls_NextLine[8]));
 				a_Lst.add(info);
 				info = new Deposit();
 			}
@@ -320,15 +320,15 @@ public class CommonUtils {
 				if (ls_NextLine.length > 4)
 					info.setInterestRate(ls_NextLine[4]);
 				if (ls_NextLine.length > 5)
-					info.setPrdinfo1(ls_NextLine[5]);
+					info.setPrdinfo1(removeLFChar(ls_NextLine[5]));
 				if (ls_NextLine.length > 6)	
-					info.setPrdinfo2(ls_NextLine[6]);
+					info.setPrdinfo2(removeLFChar(ls_NextLine[6]));
 				if (ls_NextLine.length > 7)
-					info.setPrdinfo3(ls_NextLine[7]);
+					info.setPrdinfo3(removeLFChar(ls_NextLine[7]));
 				if (ls_NextLine.length > 8)
 					info.setFee(ls_NextLine[8]);
 				if (ls_NextLine.length > 9)
-					info.setRemark(ls_NextLine[9]);
+					info.setRemark(removeLFChar(ls_NextLine[9]));
 				a_Lst.add(info);
 				info = new Loan();
 			}
@@ -408,35 +408,47 @@ public class CommonUtils {
 	}
 	
 	public SftpException handleErr(Exception e) {
-		int errCode;
+		LOGGER.error("handleErr start");
+		int errCode = 500;
 		String errMsg;
 		String msg = e.getMessage();
 		if (e instanceof JSchException) {
+			//LOGGER.error("login or connect e.getCause().getMessage() " + e.getCause().getMessage());
 			LOGGER.error("login or connect error. error message: " + msg);
 			if(msg != null) {
 				if (msg.contains("Auth fail")) {
-					errCode = 202;
 					errMsg = "ftp login failed";
-				}else if (msg.contains("Connection timed out")) {
-					errCode = 203;
+				}else if (msg.contains("Connection timed out") || msg.contains("timeout:")) {
 					errMsg = "ftp Connection timed out";
+				}else if (msg.contains("Connection refused")) {
+					errMsg = "ftp Connection refused";
 				}else {
-					errCode = 204;
 					errMsg = "ftp Connection Exception";
 				}
 			}else {
-				errCode = 204;
 				errMsg = "ftp Connection Exception";
 			}
 		}else if (e instanceof SftpException) {
+			//LOGGER.error("login or connect e.getCause().getMessage() " + e.getCause().getMessage());
 			LOGGER.error("SftpException error message: " + msg);
-			errCode = 205;
 			errMsg = "ftp error: " + msg;
 		}else {
+			//LOGGER.error("login or connect e.getCause().getMessage() " + e.getCause().getMessage());
 			LOGGER.error("other error message: " + msg);
-			errCode = 206;
 			errMsg = msg;
 		}
 		return new SftpException(errCode, errMsg);
+	}
+	
+	public String removeLFChar(String as_Str) {
+		String ls_Str = as_Str;
+		if(as_Str.contains("\r\n")) {
+			ls_Str = as_Str.replaceAll(" \r\n", " ");
+			ls_Str = ls_Str.replaceAll("\r\n", " ");
+		}else if(as_Str.contains("\n")) {
+			ls_Str = as_Str.replaceAll(" \n", " ");
+			ls_Str = ls_Str.replaceAll("\n", " ");
+		}
+		return ls_Str;
 	}
 }

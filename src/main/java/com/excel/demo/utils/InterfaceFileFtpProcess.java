@@ -72,7 +72,6 @@ public class InterfaceFileFtpProcess {
 				try {
 					l_sftpClientHandler.quit();
 				} catch (Exception e) {
-//					e.printStackTrace();
 				}
 			}
 		}
@@ -103,25 +102,20 @@ public class InterfaceFileFtpProcess {
 			l_sftpClientHandler.debugResponses(true);
 			l_sftpClientHandler.login(user, password);
 			l_sftpClientHandler.chdir(remoteInpath);
-			String [] sFileList = l_sftpClientHandler.dir("*");
-			// check file exist
-			for (int li_Cnt = 0; li_Cnt < sFileList.length; li_Cnt++) {
-				String tmpName = sFileList[li_Cnt];
-				LOGGER.info("tmpName : " + tmpName);
-				if(tmpName!=null && tmpName.equalsIgnoreCase(as_FileName)) {
-					//file exist
-					l_sftpClientHandler.get(ls_localInpath, as_FileName);
-					LOGGER.info("The remote file download successfully.");
-					LOGGER.info("Rename the remote file start");
-					l_sftpClientHandler.rename(as_FileName, as_FileName.substring(0, as_FileName.lastIndexOf(".")) + ".bak" );
-					LOGGER.info("Rename the remote file successfully End");
-					return true;
-				}else if(li_Cnt==sFileList.length -1) {
+			String [] sFileList = l_sftpClientHandler.dir(as_FileName);
+			//check file exist
+			if(sFileList.length > 0) {
+				//file exist
+				l_sftpClientHandler.get(ls_localInpath, as_FileName);
+				LOGGER.info("The remote file download successfully.");
+				LOGGER.info("Rename the remote file start");
+				l_sftpClientHandler.rename(as_FileName, as_FileName.substring(0, as_FileName.lastIndexOf(".")) + ".bak" );
+				LOGGER.info("Rename the remote file successfully End");
+				return true;
+			}else {
 					LOGGER.info("The remote file doesn't exist.");
 					return false;
-				}
 			}
-			
 		} catch (Exception e) {
 			LOGGER.error("upload file failed. error message: " + e.getMessage() );
 			e.printStackTrace();
@@ -131,11 +125,9 @@ public class InterfaceFileFtpProcess {
 				try {
 					l_sftpClientHandler.quit();
 				} catch (Exception e) {
-//					e.printStackTrace();
 				}
 			}
 		}
-		return false;
 	}
 	
 	/**

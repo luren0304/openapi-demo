@@ -1,11 +1,15 @@
 package com.excel.demo.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -14,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.excel.demo.bean.Deposit;
-import com.excel.demo.bean.ErrorMessage;
 import com.excel.demo.service.DepositService;
 import com.excel.demo.utils.InterfaceFileProcess;
 import com.jcraft.jsch.SftpException;
@@ -64,10 +67,10 @@ public class DepositController {
 			try {
 				return interfaceFileProcess.getDetails(deposit);
 			} catch (SftpException e) {
-				ErrorMessage errorMessage = new ErrorMessage();
-				errorMessage.setErrorCode(e.id);
-				errorMessage.setErrorMsg(e.getMessage());
-				return errorMessage;
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("error", e.getMessage());
+				logger.error("findByProdId" +  e.getMessage());
+				return new ResponseEntity<Object>(map, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -90,10 +93,10 @@ public class DepositController {
 			try {
 				return interfaceFileProcess.getProds("Deposits", new Deposit());
 			} catch (SftpException e) {
-				ErrorMessage errorMessage = new ErrorMessage();
-				errorMessage.setErrorCode(e.id);
-				errorMessage.setErrorMsg(e.getMessage());
-				return errorMessage;
+				Map<String, String> map = new HashMap<String, String>();
+				map.put("error", e.getMessage());
+				logger.error("findByProdId" +  e.getMessage());
+				return new ResponseEntity<Object>(map, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		

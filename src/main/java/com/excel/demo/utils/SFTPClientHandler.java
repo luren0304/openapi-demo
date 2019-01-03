@@ -328,11 +328,11 @@ public class SFTPClientHandler {
    		lp_sshConfig.setProperty("StrictHostKeyChecking", "no");
    		lp_sshConfig.setProperty("PreferredAuthentications", "password");
    		v_sshSession.setConfig(lp_sshConfig);
+   		v_sshSession.setTimeout(30000);
    		v_sshSession.connect();
     		
    		v_channel = v_sshSession.openChannel("sftp");
    		v_channel.connect();
-    		
    		v_sFTPClient = (ChannelSftp)v_channel;
    		LOGGER.info("SFTPClientHandler login successfully, JSch version = " + v_sFTPClient.version());
     }
