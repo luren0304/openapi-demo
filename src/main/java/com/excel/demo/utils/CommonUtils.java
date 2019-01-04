@@ -21,6 +21,9 @@ import com.excel.demo.bean.RateInfo;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.RFC4180Parser;
+import com.opencsv.RFC4180ParserBuilder;
 
 @Configuration
 public class CommonUtils {
@@ -31,14 +34,16 @@ public class CommonUtils {
 	@Value("${sftp.localOutpath}")
 	private String localOutpath;
 	
-	@Value("${sftp.file.delimiter:.}")
-	private String fileDelimiter;
+	@Value("${sftp.file.delimiter:,}")
+	private char fileDelimiter;
 	
 	@Value("${sftp.romteOut.file.conv:txt}")
 	private String remoteOutFileConv;
 	
 	@Value("${sftp.remoteIn.file.conv:txt}")
 	private String remoteInFileConv;
+	
+	
 	
 	private static Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 	
@@ -73,7 +78,7 @@ public class CommonUtils {
 			LOGGER.info("one of as_FileName and as_content is null" );
 			return false;
 		}
-		String ls_context="FileName=" + as_FileName;
+		String ls_context="ReplyFileName=" + as_FileName;
 		
 		PrintWriter lPw_Out = null;
 		try{
@@ -119,7 +124,7 @@ public class CommonUtils {
 			LOGGER.info("one of as_FileName and obj is null" );
 			return false;
 		}
-		String ls_context="FileName=" + as_FileName;
+		String ls_context="ReplyFileName=" + as_FileName;
 		PrintWriter lPw_Out = null;
 		try{
 			String ls_localOutpath = null;
@@ -196,7 +201,9 @@ public class CommonUtils {
 			}
 			LOGGER.info("ls_localInpath " + ls_localInpath);
 			
-			reader = new CSVReader(new FileReader(ls_localInpath));
+			//reader = new CSVReader(new FileReader(ls_localInpath));
+			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().withSeparator(fileDelimiter).build();
+			reader = new CSVReaderBuilder(new FileReader(ls_localInpath)).withCSVParser(rfc4180Parser).build();
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
 				if(obj instanceof Loan) {
@@ -239,14 +246,15 @@ public class CommonUtils {
 		String[] ls_NextLine;
 		try{
 			String ls_localInpath = null;
-			File filedir = new File(localInpath);
 			if(!localInpath.endsWith(File.separator)) {
 				ls_localInpath = localInpath + File.separator + as_Filename + "." + remoteInFileConv;;
 			}else {
 				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
 			}
 			LOGGER.info("ls_localInpath " + ls_localInpath);
-			reader = new CSVReader(new FileReader(ls_localInpath));
+			//reader = new CSVReader(new FileReader(ls_localInpath));
+			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().withSeparator(fileDelimiter).build();
+			reader = new CSVReaderBuilder(new FileReader(ls_localInpath)).withCSVParser(rfc4180Parser).build();
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
 				//info
@@ -306,7 +314,9 @@ public class CommonUtils {
 				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
 			}
 			LOGGER.info("ls_localInpath " + ls_localInpath);
-			reader = new CSVReader(new FileReader(ls_localInpath));
+			//reader = new CSVReader(new FileReader(ls_localInpath));
+			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().withSeparator(fileDelimiter).build();
+			reader = new CSVReaderBuilder(new FileReader(ls_localInpath)).withCSVParser(rfc4180Parser).build();
 			while((ls_NextLine=reader.readNext()) != null) {
 				LOGGER.info("ls_NextLine.length : " +ls_NextLine.length);
 				if(info.getProdId() == null)
@@ -367,8 +377,9 @@ public class CommonUtils {
 				ls_localInpath = localInpath + as_Filename + "." + remoteInFileConv;;
 			}
 			LOGGER.info("ls_localInpath " + ls_localInpath);
-			reader = new CSVReader(new FileReader(ls_localInpath));
-			
+			//reader = new CSVReader(new FileReader(ls_localInpath));
+			RFC4180Parser rfc4180Parser = new RFC4180ParserBuilder().withSeparator(fileDelimiter).build();
+			reader = new CSVReaderBuilder(new FileReader(ls_localInpath)).withCSVParser(rfc4180Parser).build();
 			String ls_Ccy = info.getCcy_Cde();
 			String ls_RelvtCcy = info.getRelvt_Ccy_Cde();
 			while((ls_NextLine=reader.readNext()) != null) {
